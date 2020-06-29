@@ -1,0 +1,112 @@
+CREATE TABLE IF NOT EXISTS departments(
+    department_ID int,
+    department_name varchar(40),
+    head_teacher_ID int, 
+    PRIMARY KEY (department_ID)
+);
+    
+CREATE TABLE IF NOT EXISTS teachers(
+	teacher_ID int,
+    teacher_first_name varchar(40),
+    teacher_last_name varchar(40),
+    main_department_ID int,
+    total_value double,
+    PRIMARY KEY (teacher_ID),
+    FOREIGN KEY (main_department_ID) REFERENCES departments(department_ID)
+);
+
+CREATE TABLE IF NOT EXISTS compulsory_groups(
+	compulsory_group_ID int,
+    value_factor double,
+    PRIMARY KEY (compulsory_group_ID)
+);
+
+CREATE TABLE IF NOT EXISTS subjects(
+	subject_name varchar(40),
+    compulsory_group_ID int,
+    PRIMARY KEY (subject_name),
+    FOREIGN KEY (compulsory_group_ID) REFERENCES compulsory_groups(compulsory_group_ID)
+);
+
+CREATE TABLE IF NOT EXISTS lessons(
+	topic varchar(40),
+    subject_name varchar(40),
+    is_practical boolean,
+    PRIMARY KEY (topic),
+    FOREIGN KEY (subject_name) REFERENCES subjects(subject_name)
+);
+
+CREATE TABLE IF NOT EXISTS record(
+	calendaric_year year,
+  	academic_year int,
+  	class_ID varchar(2),
+    PRIMARY KEY (calendaric_year, academic_year)
+);
+
+CREATE TABLE IF NOT EXISTS curriculum(
+	curriculum_ID int,
+    subject_name varchar(40),
+    academic_year int,
+    weekly_hours int,
+    PRIMARY KEY (curriculum_ID),
+    FOREIGN KEY (subject_name) REFERENCES subjects(subject_name)
+);
+
+CREATE TABLE IF NOT EXISTS students(
+	student_ID int,
+    student_first_name varchar(40),
+    student_last_name varchar(40),
+    parent_first_name varchar(40),
+    parent_last_name varchar(40),
+    role varchar(40),
+    PRIMARY KEY (student_ID)
+);
+
+CREATE TABLE IF NOT EXISTS roles(
+	role_name varchar(40),
+    student_ID int,
+    class_ID varchar(2),
+    calendaric_year year,
+    PRIMARY KEY (role_name),
+    FOREIGN KEY (student_ID) REFERENCES students(student_ID),
+    FOREIGN KEY (calendaric_year) REFERENCES record(calendaric_year)
+);
+
+CREATE TABLE IF NOT EXISTS classes(
+    class_ID varchar(2),
+    department_ID int,
+    calendaric_year year,
+    PRIMARY KEY (class_ID), 
+    FOREIGN KEY (department_ID) REFERENCES departments(department_ID),
+	FOREIGN KEY (calendaric_year) REFERENCES record(calendaric_year)
+);
+
+CREATE TABLE IF NOT EXISTS marks (
+	student_ID int,
+    subject_name varchar(40),
+    academic_year int,
+    calendaric_year year,
+    grade int,
+    PRIMARY KEY (student_ID, subject_name, academic_year, calendaric_year),
+    FOREIGN KEY (student_ID) REFERENCES students(student_ID),
+
+    FOREIGN KEY (academic_year) REFERENCES record(academic_year)
+);
+ALTER TABLE departments ADD FOREIGN KEY (head_teacher_ID) REFERENCES teachers(teacher_ID);
+
+ALTER TABLE students ADD FOREIGN KEY (role) REFERENCES roles(role_name);
+
+ALTER TABLE record ADD FOREIGN KEY (class_ID) REFERENCES classes(class_ID);
+
+ALTER TABLE curriculum ADD FOREIGN KEY (subject_name) REFERENCES subjects(subject_name);
+
+ALTER TABLE roles ADD FOREIGN KEY (class_ID) REFERENCES classes(class_ID);
+
+ALTER TABLE classes ADD FOREIGN KEY (calendaric_year) REFERENCES record(calendaric_year);
+
+ALTER TABLE marks ADD FOREIGN KEY (subject_name) REFERENCES subjects(subject_name);
+
+ALTER TABLE marks ADD FOREIGN KEY (calendaric_year) REFERENCES record(calendaric_year);
+
+
+-------------100
